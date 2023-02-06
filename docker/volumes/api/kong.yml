@@ -6,10 +6,10 @@ _format_version: "1.1"
 consumers:
   - username: anon
     keyauth_credentials:
-      - key: ${ANON_KEY}
+      - key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2NzU2Mjk4MjgsImV4cCI6MTcwNzE2NTgyOCwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsIkdpdmVuTmFtZSI6IkpvaG5ueSIsIlN1cm5hbWUiOiJSb2NrZXQiLCJFbWFpbCI6Impyb2NrZXRAZXhhbXBsZS5jb20iLCJSb2xlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.lXiTLje-JDd1za0tvDHt9pM4IXA9GF_rRDlGpOErGtY
   - username: service_role
     keyauth_credentials:
-      - key: ${SERVICE_ROLE_KEY}
+      - key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICAgInJvbGUiOiAic2VydmljZV9yb2xlIiwKICAgICJpc3MiOiAic3VwYWJhc2UiLAogICAgImlhdCI6IDE2NzU1NTUyMDAsCiAgICAiZXhwIjogMTgzMzMyMTYwMAp9.54MvZlNMbeHRkx2KoQc1-lx23w6gynVFsFpR47VVgko
 
 ###
 ### Access Control List
