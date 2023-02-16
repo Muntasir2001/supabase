@@ -120,3 +120,5 @@ typings/
 **/supabase/.temp
 
 apps/new-docs/*
+
+certbot
