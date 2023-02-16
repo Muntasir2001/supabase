@@ -241,3 +241,11 @@ services:
       # Must be superuser to enable pg_net extension
       - ./volumes/db/webhooks.sql:/etc/postgresql.schema.sql
       - ./volumes/db/data:/var/lib/postgresql/data
+
+  reverse_proxy:
+    image: nginx:stable-alpine
+    volumes:
+        - ./reverse_proxy/nginx.conf:/etc/nginx/conf.d/default.conf
+    restart: always
+    ports:
+        - 80:80
