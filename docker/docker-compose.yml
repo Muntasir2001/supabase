@@ -7,6 +7,33 @@
 version: "3.8"
 
 services:
+  traefik:
+    image: traefik:v2.5
+    restart: always
+    labels:
+       - "traefik.enable=true"
+
+       - "traefik.http.routers.traefik_http.rule=Host(`${TRAEFIK_DNS}`)"
+       - "traefik.http.routers.traefik_http.entrypoints=web"
+       - "traefik.http.routers.traefik_http.service=api@internal"
+       - "traefik.http.routers.traefik_http.middlewares=traefik-auth"
+
+       - "traefik.http.middlewares.traefik-auth.basicauth.users=user:$$apr1$$46zj6hBn$$O9UmXSrzqzmgd74ID1wcM0"
+    command:
+      - "--api=true"
+      - "--api.dashboard=true"
+#      - "--log.level=DEBUG"
+      - "--providers.docker"
+      - "--providers.docker.network=example_web"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entrypoints.web.address=:30000"
+    ports:
+      - "80:30000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik
+
   studio:
     container_name: supabase-studio
     image: supabase/studio:20230127-6bfd87b
@@ -29,6 +56,9 @@ services:
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+    networks:
+      - traefik
+      - supabase
 
   kong:
     container_name: supabase-kong
@@ -49,6 +79,9 @@ services:
       ANON_KEY: ${ANON_KEY}
     volumes:
       - ./volumes/api:/var/lib/kong:ro
+    networks:
+      - traefik
+      - supabase
 
   auth:
     container_name: supabase-auth
@@ -98,6 +131,9 @@ services:
       GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
       GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
       MFA_ENABLED: ${MFA_ENABLED}
+    networks:
+      - traefik
+      - supabase
 
   rest:
     container_name: supabase-rest
@@ -112,6 +148,8 @@ services:
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: "false"
+    networks:
+      - supabase
 
   realtime:
     container_name: realtime-dev.supabase-realtime
@@ -143,6 +181,8 @@ services:
       DNS_NODES: "''"
     command: >
       sh -c "/app/bin/migrate && /app/bin/realtime eval 'Realtime.Release.seeds(Realtime.Repo)' && /app/bin/server"
+    networks:
+      - supabase
 
   storage:
     container_name: supabase-storage
@@ -177,6 +217,8 @@ services:
       IMGPROXY_URL: http://imgproxy:5001
     volumes:
       - ./volumes/storage:/var/lib/storage
+    networks:
+      - supabase
 
   imgproxy:
     container_name: supabase-imgproxy
@@ -192,6 +234,8 @@ services:
       IMGPROXY_USE_ETAG: "true"
     volumes:
       - ./volumes/storage:/var/lib/storage
+    networks:
+      - supabase
 
   meta:
     container_name: supabase-meta
@@ -207,6 +251,8 @@ services:
       PG_META_DB_NAME: ${POSTGRES_DB}
       PG_META_DB_USER: supabase_admin
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - supabase
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
@@ -241,22 +287,29 @@ services:
       # Must be superuser to enable pg_net extension
       - ./volumes/db/webhooks.sql:/etc/postgresql.schema.sql
       - ./volumes/db/data:/var/lib/postgresql/data
+    networks:
+      - supabase
 
-  reverse_proxy:
-    image: nginx:stable-alpine
-    volumes:
-        - ./reverse_proxy/nginx.conf:/etc/nginx/conf.d/default.conf/:ro
-        - ./certbot/www/:/var/www/certbot/:ro
-        - ./certbot/conf/:/etc/nginx/ssl/:ro
-    restart: always
-    ports:
-        - 80:80
-        - 443:443
+  # reverse_proxy:
+  #   image: nginx:stable-alpine
+  #   volumes:
+  #       - ./reverse_proxy/nginx.conf:/etc/nginx/conf.d/default.conf/:ro
+  #       - ./certbot/www/:/var/www/certbot/:ro
+  #       - ./certbot/conf/:/etc/nginx/ssl/:ro
+  #   restart: always
+  #   ports:
+  #       - 80:80
+  #       - 443:443
 
   
-  certbot:
-    image: certbot/certbot:arm64v8-v2.3.0
-    volumes:
-      - ./certbot/www/:/var/www/certbot/:rw
-      - ./certbot/conf/:/etc/letsencrypt/:rw
+  # certbot:
+  #   image: certbot/certbot:arm64v8-v2.3.0
+  #   volumes:
+  #     - ./certbot/www/:/var/www/certbot/:rw
+  #     - ./certbot/conf/:/etc/letsencrypt/:rw
 
+networks:
+  traefik:
+    external: false
+  supabase:
+    external: false  
