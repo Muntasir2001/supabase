@@ -6,12 +6,12 @@ _format_version: "1.1"
 consumers:
   - username: anon
     keyauth_credentials:
-      - key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICAgInJvbGUiOiAiYW5vbiIsCiAgICAiaXNzIjogInN1cGFiYXNlIiwKICAgICJpYXQiOiAxNjc1NjQxNjAwLAogICAgImV4cCI6IDE4MzM0MDgwMDAKfQ.HHz3pqnF9zpTt9a1njcgZ3I9PtNllTCDA5jZCOcJGyk
-      # - key: ${ANON_KEY}
+      # - key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICAgInJvbGUiOiAiYW5vbiIsCiAgICAiaXNzIjogInN1cGFiYXNlIiwKICAgICJpYXQiOiAxNjc1NjQxNjAwLAogICAgImV4cCI6IDE4MzM0MDgwMDAKfQ.HHz3pqnF9zpTt9a1njcgZ3I9PtNllTCDA5jZCOcJGyk
+      - key: ${ANON_KEY}
   - username: service_role
     keyauth_credentials:
-      - key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICAgInJvbGUiOiAic2VydmljZV9yb2xlIiwKICAgICJpc3MiOiAic3VwYWJhc2UiLAogICAgImlhdCI6IDE2NzU2NDE2MDAsCiAgICAiZXhwIjogMTgzMzQwODAwMAp9.M561YjP7N7l-DA7ycTQXJ20No1lKHkouxABCHx3tPMo
-      # - key: ${SERVICE_ROLE_KEY}
+      # - key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICAgInJvbGUiOiAic2VydmljZV9yb2xlIiwKICAgICJpc3MiOiAic3VwYWJhc2UiLAogICAgImlhdCI6IDE2NzU2NDE2MDAsCiAgICAiZXhwIjogMTgzMzQwODAwMAp9.M561YjP7N7l-DA7ycTQXJ20No1lKHkouxABCHx3tPMo
+      - key: ${SERVICE_ROLE_KEY}
 
 ###
 ### Access Control List
