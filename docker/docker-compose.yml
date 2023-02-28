@@ -11,23 +11,34 @@ services:
     image: traefik:v2.5
     restart: always
     labels:
-       - "traefik.enable=true"
+      - "traefik.enable=true"
 
-       - "traefik.http.routers.traefik_http.rule=Host(`${TRAEFIK_DNS}`)"
-       - "traefik.http.routers.traefik_http.entrypoints=web"
-       - "traefik.http.routers.traefik_http.service=api@internal"
-       - "traefik.http.routers.traefik_http.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik_http.rule=Host(`${TRAEFIK_DNS}`)"
+      - "traefik.http.routers.traefik_http.entrypoints=web"
+      - "traefik.http.routers.traefik_http.service=api@internal"
+      - "traefik.http.routers.traefik_http.middlewares=traefik-auth"
 
-       - "traefik.http.middlewares.traefik-auth.basicauth.users=user:$$apr1$$46zj6hBn$$O9UmXSrzqzmgd74ID1wcM0"
+        #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=muntasirenamalhuda@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=user:$$apr1$$46zj6hBn$$O9UmXSrzqzmgd74ID1wcM0"
     command:
       - "--api=true"
       - "--api.dashboard=true"
 #      - "--log.level=DEBUG"
       - "--providers.docker"
-      - "--providers.docker.network=example_web"
+      - "--providers.docker.network=traefik"
       - "--providers.docker.exposedByDefault=false"
       - "--entrypoints.web.address=:30000"
     ports:
+      - "443:443"
       - "80:30000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -48,14 +59,21 @@ services:
     labels:
       - "traefik.enable=true"
 
-      - "traefik.http.routers.supabase_studio_http.rule=Host(`${STUDIO_DNS}`)"
+      - "traefik.http.routers.supabase_studio_https.rule=Host(`${STUDIO_DNS}`)"
+      - "traefik.http.routers.supabase_studio_https.entrypoints=websecure"
+      - "traefik.http.routers.supabase_studio_https.tls=true"
+      - "traefik.http.routers.supabase_studio_https.tls.certResolver=letsencrypt"
+      - "traefik.http.routers.supabase_studio_https.tls.domains[0].main=${STUDIO_DNS}"
+      - "traefik.http.routers.supabase_studio_https.service=studio-supabase-studio"
+      - 'traefik.http.routers.supabase_studio_https.middlewares=traefik-auth'
       - "traefik.http.routers.supabase_studio_http.entrypoints=web"
-      - "traefik.http.routers.supabase_studio_http.service=studio-supabase-studio"
-      - 'traefik.http.routers.supabase_studio_http.middlewares=traefik-auth'
+      - "traefik.http.routers.supabase_studio_http.middlewares=https_redirect"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
 
       - "traefik.http.services.studio-supabase-studio.loadbalancer.server.port=3000"
 
-      - "traefik.docker.network=example_web"
+      - "traefik.docker.network=traefik"
     environment:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -80,13 +98,13 @@ services:
       - ${KONG_HTTPS_PORT}:8443/tcp
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.supabase_kong_http.rule=Host(`${API_DNS}`)"
-      - "traefik.http.routers.supabase_kong_http.entrypoints=web"
-      - "traefik.http.routers.supabase_kong_http.service=kong-supabase-kong"
+      - "traefik.http.routers.supabase_kong_https.rule=Host(`${API_DNS}`)"
+      - "traefik.http.routers.supabase_kong_https.entrypoints=web"
+      - "traefik.http.routers.supabase_kong_https.service=kong-supabase-kong"
 
       - "traefik.http.services.kong-supabase-kong.loadbalancer.server.port=8000"
 
-      - "traefik.docker.network=example_web"
+      - "traefik.docker.network=traefik"
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
