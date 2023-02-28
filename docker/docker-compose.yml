@@ -45,6 +45,17 @@ services:
       retries: 3
     ports:
       - ${STUDIO_PORT}:3000/tcp
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.supabase_studio_http.rule=Host(`${STUDIO_DNS}`)"
+      - "traefik.http.routers.supabase_studio_http.entrypoints=web"
+      - "traefik.http.routers.supabase_studio_http.service=studio-supabase-studio"
+      - 'traefik.http.routers.supabase_studio_http.middlewares=traefik-auth'
+
+      - "traefik.http.services.studio-supabase-studio.loadbalancer.server.port=3000"
+
+      - "traefik.docker.network=example_web"
     environment:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -67,6 +78,15 @@ services:
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.supabase_kong_http.rule=Host(`${API_DNS}`)"
+      - "traefik.http.routers.supabase_kong_http.entrypoints=web"
+      - "traefik.http.routers.supabase_kong_http.service=kong-supabase-kong"
+
+      - "traefik.http.services.kong-supabase-kong.loadbalancer.server.port=8000"
+
+      - "traefik.docker.network=example_web"
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
