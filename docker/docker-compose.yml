@@ -59,7 +59,7 @@ services:
       - "traefik.http.routers.supabase_studio_https.rule=Host(`${STUDIO_DNS}`)"
       - "traefik.http.routers.supabase_studio_https.entrypoints=websecure"
       - "traefik.http.routers.supabase_studio_https.tls=true"
-      - "traefik.http.routers.supabase_studio_https.tls.certResolver=letsencrypt"
+      - "traefik.http.routers.supabase_studio_https.tls.certResolver=myresolver"
       - "traefik.http.routers.supabase_studio_https.tls.domains[0].main=${STUDIO_DNS}"
       - "traefik.http.routers.supabase_studio_https.service=studio-supabase-studio"
       - 'traefik.http.routers.supabase_studio_https.middlewares=traefik-auth'
